@@ -43,7 +43,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     # gets values from cookie if configured and present
     parsed_auth_cookie = {}
     if DeviseTokenAuth.cookie_enabled
-      auth_cookie = request.cookies[DeviseTokenAuth.cookie_name]
+      auth_cookie = cookie_reader(request)[DeviseTokenAuth.cookie_name]
       if auth_cookie.present?
         parsed_auth_cookie = JSON.parse(cookie_store.parse(auth_cookie))
       end
@@ -161,12 +161,16 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     end # end lock
   end
 
-  def cookie_store
+  def cookie_writer
     DeviseTokenAuth.cookie_attributes[:encrypt] == true ? cookies.encrypted : cookies
   end
 
+  def cookie_reader(request)
+    DeviseTokenAuth.cookie_attributes[:encrypt] == true ? request.cookie_jar.encrypted : request.cookie_jar
+  end
+
   def set_cookie(auth_header)
-    cookie_store[DeviseTokenAuth.cookie_name] = DeviseTokenAuth.cookie_attributes.merge(value: auth_header.to_json)
+    cookie_writer[DeviseTokenAuth.cookie_name] = DeviseTokenAuth.cookie_attributes.merge(value: auth_header.to_json)
   end
 
   def is_batch_request?(user, client)
