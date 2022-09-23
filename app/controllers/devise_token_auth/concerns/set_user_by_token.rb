@@ -45,7 +45,7 @@ module DeviseTokenAuth::Concerns::SetUserByToken
     if DeviseTokenAuth.cookie_enabled
       auth_cookie = cookie_reader(request)[DeviseTokenAuth.cookie_name]
       if auth_cookie.present?
-        parsed_auth_cookie = JSON.parse(cookie_store.parse(auth_cookie))
+        parsed_auth_cookie = JSON.parse(auth_cookie)
       end
     end
 
